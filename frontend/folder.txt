@@ -1,0 +1,57 @@
+mern-todo-nginx/
+├── backend-auth/
+│   ├── Dockerfile            # Dockerfile for Auth Service
+│   ├── server.js             # Entry point for Auth Service (wires up routes + controllers)
+│   ├── controllers/
+│   │   └── authController.js # Controller functions (signup, login)
+│   ├── routes/
+│   │   └── auth.js           # Defines endpoints and calls controller functions
+│   ├── models/
+│   │   └── User.js           # Mongoose User schema
+│   ├── package.json
+│   └── .env                  # (Optional: service-specific env overrides)
+│
+├── backend-profile/
+│   ├── Dockerfile               # Dockerfile for Profile Service
+│   ├── server.js                # Entry point for Profile Service (wires up routes + controllers)
+│   ├── controllers/
+│   │   └── profileController.js # Controller functions (getProfile, updateProfile, etc.)
+│   ├── routes/
+│   │   └── profileRoutes.js     # Defines endpoints and calls controller functions
+│   ├── models/
+│   │   └── profile.js           # Mongoose Profile schema
+│   ├── middleware/
+│   │   └── authMiddleware.js    # Protect and decode JWT from incoming requests
+│   ├── package.json
+│   └── .env                     # (Optional: service-specific env overrides)
+│
+├── backend-todo/
+│   ├── Dockerfile            # Dockerfile for Todo Service
+│   ├── server.js             # Entry point for Todo Service (wires up routes + controllers)
+│   ├── controllers/
+│   │   └── todoController.js # Controller functions (getTodos, addTodo, updateTodo, deleteTodo)
+│   ├── routes/
+│   │   └── todos.js          # Defines endpoints and calls controller functions
+│   ├── models/
+│   │   └── Todo.js           # Mongoose Todo schema
+│   ├── package.json
+│   └── .env                  # (Optional: service-specific env overrides)
+│
+├── frontend/
+│   ├── vite.config.js        # Vite configuration file
+│   ├── Dockerfile            # Placeholder (build handled in project-root Dockerfile.nginx)
+│   ├── package.json
+│   ├── index.html            # Vite entry HTML
+│   ├── src/                  # React + Vite source code
+│   │   ├── main.jsx
+│   │   ├── App.jsx
+│   │   └── Components/
+│   │       ├── Login.jsx
+│   │       ├── Signup.jsx
+│   │       └── Todos.jsx
+│   └── dist/                 # Production build output (populated after `npm run build`)
+│
+├── nginx/
+│   └── default.conf          # Nginx configuration to serve frontend and proxy APIs
+│
+└── docker-compose.yml        # Multi-service Docker orchestration (auth, profile, todo, nginx, etc.)
