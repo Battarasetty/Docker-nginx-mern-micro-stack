@@ -1,0 +1,161 @@
+MERN + NGINX + Docker Setup & Request Flow Documentation
+
+Project Folder Structure
+mern-todo-nginx/
+├── backend-auth/
+│   ├── Dockerfile
+│   ├── server.js
+│   ├── controllers/authController.js
+│   ├── routes/auth.js
+│   ├── models/User.js
+│   ├── package.json
+│   └── .env
+│
+├── backend-profile/
+│   ├── Dockerfile
+│   ├── server.js
+│   ├── controllers/profileController.js
+│   ├── routes/profileRoutes.js
+│   ├── models/profile.js
+│   ├── middleware/authMiddleware.js
+│   ├── package.json
+│   └── .env
+│
+├── backend-todo/
+│   ├── Dockerfile
+│   ├── server.js
+│   ├── controllers/todoController.js
+│   ├── routes/todos.js
+│   ├── models/Todo.js
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── vite.config.js
+│   ├── Dockerfile  (mostly placeholder, actual build handled by nginx container)
+│   ├── package.json
+│   ├── index.html
+│   ├── src/
+│   │   ├── main.jsx
+│   │   ├── App.jsx
+│   │   └── Components/
+│   │       ├── Login.jsx
+│   │       ├── Signup.jsx
+│   │       └── Todos.jsx
+│   └── dist/   (build output after `npm run build`)
+│
+├── nginx/
+│   └── default.conf
+│
+└── docker-compose.yml
+
+How Requests Flow: NGINX, Docker, and React SPA
+1. Accessing Frontend Routes (React SPA)
+You open your browser on http://localhost/ or any React route like /login, /signup, /todos.
+
+Your browser sends the request to localhost:80 on Windows.
+
+Docker Desktop forwards localhost:80 on Windows to the WSL2 VM localhost:80.
+
+NGINX container listens on port 80 inside WSL2 and serves requests to respective conatiners.
+
+NGINX checks the requested path:
+
+If path starts with /api/..., it proxies to the relevant backend container (auth, todo, profile).
+
+If path is anything else (like /, /login, /signup, /todos), NGINX serves index.html of your React app.
+
+The React SPA boots, reads the URL path (e.g., /login), and renders the corresponding React component (Login, Signup, Todos, etc).
+
+React Router handles client-side routing.
+
+2. Accessing API Routes (Auth, Todo, Profile Services)
+From React, you call APIs like:
+fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(data), headers: {...} })
+The request goes from browser → localhost:80 (Windows) → WSL2 localhost:80 → NGINX container.
+
+NGINX matches the path /api/auth/ in its config (default.conf) and proxies the request to the auth service container (usually on port 5000).
+
+Auth service processes the request and responds.
+
+NGINX container forwards the response back to the WSL2 localhost, from there to Windows localhost, I mean browser it will reach.
+
+React receives response, processes (e.g., stores token), and updates UI.
+
+Similar proxy rules exist for /api/todos/ and /api/profile/ forwarding to their respective backend containers.
+
+3. Special Case: MongoDB Port (27017)
+You expose MongoDB container port as 27017:27017 in Docker.
+
+However, unlike port 80, Docker Desktop does not automatically forward Windows localhost:27017 to WSL2 localhost:27017.
+
+This means:
+
+From Windows tools like MongoDB Compass, connecting to localhost:27017 will NOT work out of the box.
+
+You must connect to the WSL2 VM IP address with port 27017, e.g. 172.x.x.x:27017.
+
+This is because Docker Desktop forwards ports like 80 and 443 by default but doesn't forward arbitrary ports like 27017 automatically.
+
+Workarounds:
+
+Use the WSL2 IP address for MongoDB connections from Windows.
+
+Set up manual port forwarding from Windows to WSL2.
+
+Alternatively, run MongoDB outside WSL2/docker for local Windows access.
+
+NGINX default.conf Summary
+location /api/auth/ → proxy_pass to http://auth:5000
+
+location /api/todos/ → proxy_pass to http://todo:5001
+
+location /api/profile/ → proxy_pass to http://profile:5002
+
+location / → serve React SPA's index.html for all other paths (fallback for client-side routing)
+
+Example Request Flow Summary
+Browser URL / Request Path	Handled by	Response
+/ or /login or /signup	NGINX static index.html + React SPA routes	React components render accordingly
+/api/auth/login	NGINX → Auth service container (port 5000)	Auth service returns JWT token
+/api/todos	NGINX → Todo service container (port 5001)	Todo service returns todo list
+/api/profile	NGINX → Profile service container (port 5002)	Profile service returns profile data
+MongoDB connection from Windows	Not forwarded to WSL2 automatically	Connect via WSL2 IP (e.g., 172.x.x.x:27017)
+
+Key Points to Remember
+NGINX splits requests based on path: /api/ routes are proxied to backend services; all else serves React SPA.
+
+Docker Desktop forwards Windows localhost:80 to WSL2 localhost:80, so HTTP works smoothly for NGINX.
+
+Docker Desktop does NOT forward Windows localhost:27017 to WSL2 localhost:27017 automatically for MongoDB; you must use the WSL2 IP address instead.
+
+React Router handles client-side routing and deep links using the SPA fallback index.html.
+
+Your microservices (auth, todo, profile) are hidden behind NGINX under /api/..., so clients always talk to a single origin localhost.
+
+
+Important
+How Requests Flow
+Request from Windows Browser:
+
+When you open http://localhost or call any API using localhost in your Windows browser, this request is first caught by Docker Desktop.
+
+Docker Desktop forwards request to WSL2:
+
+Docker Desktop internally routes the request from Windows localhost to WSL2 localhost.
+
+WSL2 routes request to the correct Docker container:
+
+Inside WSL2, Docker uses port mappings defined in your docker-compose.yml (e.g., 80:80 for NGINX, 27017:27017 for MongoDB) to forward the request to the corresponding container.
+
+For example, localhost:80 in Windows → forwarded to WSL2 localhost:80 → routed by Docker to the NGINX container.
+
+Similarly, localhost:27017 in Windows → forwarded to WSL2 localhost:27017 → routed by Docker to the MongoDB container.
+
+Container processes request:
+
+The targeted container (e.g., NGINX) handles the request. NGINX forwards API calls to backend containers (auth, todo, profile) based on URL path and proxy rules.
+
+Response travels back the same way:
+
+The container sends the response back through Docker → WSL2 → Docker Desktop → Windows localhost → your browser.

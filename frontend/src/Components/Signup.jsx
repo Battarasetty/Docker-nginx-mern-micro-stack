@@ -27,7 +27,7 @@ export default function Signup() {
 
   return (
     <div>
-      <h2>Sign Up</h2>
+      <h2>Sign Up for user</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <input

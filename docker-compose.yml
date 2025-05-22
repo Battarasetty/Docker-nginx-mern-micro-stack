@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongo:
     image: mongo:latest
@@ -10,7 +8,9 @@ services:
     networks: [mern-network]
 
   auth:
-    build: ./backend-auth
+    build:
+      context: ./backend-auth
+      dockerfile: Dockerfile.dev
     container_name: auth
     env_file: ./backend-auth/.env
     networks: [mern-network]
