@@ -1,21 +1,38 @@
-+---------------------------+
-|       Docker Host         |
-|                           |
-|   +-------------------+   |
-|   |     docker0       |   |  <-- Bridge network with subnet
-|   |   (Bridge)        |   |      e.g., 172.17.0.0/16
-|   +---------+---------+   |
-|             |             |
-|     veth0---|---veth1     |   <-- veth pairs connecting containers
-|             |             |
-+-------------|-------------+
+                  +----------------------------+
+                  |       Windows Host          |
+                  |                            |
+                  |  +----------------------+  |
+                  |  |      docker0 Bridge    |  <-- Bridge network (e.g., 172.17.0.0/16)
+                  |  +----------+-----------+  |
+                  |             |              |
+     +------------+--+       +--+------------+  |       Physical NIC (e.g., Wi-Fi adapter)
+     |  veth0       |         |   veth1       |  |            |
+     |  (to C1)     |         |  (to C2)      |  |            |
+     +-----+-------+         +------+--------+  |            |
+           |                       |             |            |
++----------+---------+   +---------+-----------+ |            |
+|    Container 1     |   |     Container 2      | |            |
+|  +------------+    |   |  +-------------+     | |            |
+|  |    eth0    |    |   |  |    eth0     |     | |            |
+|  | IP:172.17.x.x|   |   |  | IP:172.17.x.x|    | |            |
+|  +------------+    |   |  +-------------+     | |            |
++--------------------+   +---------------------+ |            |
+                                                    |            |
+                   Container-to-Container           |            |
+                   communication:                   |            |
+                   eth0 → veth0 → docker0 bridge → veth1 → eth0   |
+                                                    |            |
+                  Container-to-Host                  |            |
+                  communication:                    |            |
+                  eth0 → veth0 → docker0 bridge → Host network stack|
+                                                    |            |
+                Container-to-Outside (Internet)     |            |
+                communication:                      |            |
+        eth0 → veth0 → docker0 bridge → Host NIC → NAT → Internet  |
+                                                    |            |
+                Host-to-Container                   |            |
+                communication:                      |            |
+        Host network stack → docker0 bridge → veth0 → eth0         |
+                  (Container IP)                        |
+                  +------------------------------------+
 
-              |                     |
-    +----------------+     +----------------+
-    |  Container 1   |     |  Container 2   |
-    |                |     |                |
-    |   +--------+   |     |   +--------+   |
-    |   |  eth0  |   |     |   |  eth0  |   |
-    |   +--------+   |     |   +--------+   |
-    |  IP: 172.17.x.x|     |  IP: 172.17.x.x|
-    +----------------+     +----------------+
