@@ -1,0 +1,42 @@
+[Host Machine (Your PC)]
+        |
+        |  (MongoDB Client: Compass or CLI)
+        |  Connects to either
+        |  localhost:27017  OR  172.21.128.1:27017
+        |
+        v
++------------------------+
+| Host OS Network Stack  |
++------------------------+
+        |                               
+        | 
+        |  (If using localhost:27017)
+        |   - This points to host machine's loopback interface (127.0.0.1)
+        |   - Docker port mapping attempts to forward this to MongoDB container
+        |   - But if Docker runs inside VM, host's localhost ≠ VM's localhost
+        |   - Connection fails or nothing listening here
+        |
+        |  (If using VM IP 172.21.128.1:27017)
+        |   - Connects directly to VM's network interface
+        |   - Network traffic routed to VM (e.g., WSL or Hyper-V VM)
+        |
+        v
++--------------------------+
+| VM Network Interface     |  <-- IP 172.21.128.1
++--------------------------+
+        |
+        |  Docker inside VM listens on port 27017 (mapped from Mongo container)
+        |  Docker forwards traffic inside VM network namespace
+        |
+        v
++--------------------------+
+| Docker Container Network |
++--------------------------+
+        |
+        |  MongoDB container listens on port 27017 internally
+        v
++--------------------------+
+| MongoDB Container        |
+|   - MongoDB server       |
+|   - Database files       |
++--------------------------+
