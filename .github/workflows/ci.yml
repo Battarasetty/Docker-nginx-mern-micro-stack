@@ -1,0 +1,50 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build backend-auth
+        run: docker build -t backend-auth ./backend-auth
+
+      - name: Build backend-profile
+        run: docker build -t backend-profile ./backend-profile
+
+      - name: Build backend-todo
+        run: docker build -t backend-todo ./backend-todo
+
+      - name: Build frontend
+        run: docker build -t frontend ./frontend
+
+      - name: Lint frontend code
+        run: |
+          cd frontend
+          npm install
+          npm run lint || true
