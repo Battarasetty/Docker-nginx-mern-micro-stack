@@ -8,9 +8,7 @@ services:
     networks: [mern-network]
 
   auth:
-    build:
-      context: ./backend-auth
-      dockerfile: Dockerfile.dev
+    build: ./backend-auth
     container_name: auth
     env_file: ./backend-auth/.env
     networks: [mern-network]

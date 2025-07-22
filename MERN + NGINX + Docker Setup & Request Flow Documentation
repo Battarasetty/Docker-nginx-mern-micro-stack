@@ -42,6 +42,7 @@ mern-todo-nginx/
 │   │       ├── Login.jsx
 │   │       ├── Signup.jsx
 │   │       └── Todos.jsx
+│   │       └── Profile.jsx
 │   └── dist/   (build output after `npm run build`)
 │
 ├── nginx/

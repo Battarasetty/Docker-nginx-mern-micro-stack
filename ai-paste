@@ -1,0 +1,176 @@
+🔧 Architecture:
+Microservices-based backend:
+
+backend-auth (authentication)
+
+backend-profile (user profile)
+
+backend-todo (todo tasks)
+
+Frontend: React + Vite app
+
+NGINX: Acts as reverse proxy and static file server
+
+Docker Compose: Manages multi-container app setup
+
+📁 Project Structure
+Copy
+Edit
+mern-todo-nginx/
+├── backend-auth/
+├── backend-profile/
+├── backend-todo/
+├── frontend/
+├── nginx/
+└── docker-compose.yml
+🔒 1. backend-auth/
+Handles user registration and login.
+
+Files:
+server.js: Entry point for the service.
+
+controllers/authController.js:
+
+registerUser: Registers a new user.
+
+loginUser: Authenticates user and returns JWT.
+
+routes/auth.js: Defines /api/auth/register and /api/auth/login endpoints.
+
+models/User.js: Mongoose schema for User.
+
+.env: JWT secret, DB URI.
+
+Dockerfile: Sets up Node environment for auth service.
+
+👤 2. backend-profile/
+Handles user profile CRUD operations.
+
+Files:
+server.js: Starts the profile service.
+
+controllers/profileController.js:
+
+getProfile: Returns profile info.
+
+updateProfile: Updates user profile.
+
+routes/profileRoutes.js: Routes for /api/profile.
+
+models/profile.js: Mongoose schema for Profile.
+
+middleware/authMiddleware.js: Verifies JWT.
+
+Dockerfile: Sets up this service as a container.
+
+✅ 3. backend-todo/
+Handles to-do items CRUD operations.
+
+Files:
+server.js: Entry point for todo service.
+
+controllers/todoController.js:
+
+getTodos, createTodo, updateTodo, deleteTodo.
+
+routes/todos.js: Endpoints for /api/todos.
+
+models/Todo.js: Mongoose schema for Todo items.
+
+Dockerfile: Containerizes the service.
+
+🎨 4. frontend/
+Frontend Vite + React app.
+
+Files:
+vite.config.js: Build config.
+
+Dockerfile: Placeholder only (actual serving via NGINX).
+
+src/
+
+main.jsx: App entry.
+
+App.jsx: Routes to Login, Signup, Profile, Todos.
+
+Components/
+
+Login.jsx: Login form.
+
+Signup.jsx: Registration.
+
+Todos.jsx: Lists and manages todos.
+
+Profile.jsx: Profile view/edit.
+
+dist/: Output after npm run build
+
+🌐 5. nginx/
+Serves frontend and proxies API calls.
+
+Files:
+default.conf:
+
+Serves static files from /usr/share/nginx/html
+
+Proxies API requests to:
+
+/api/auth → backend-auth
+
+/api/profile → backend-profile
+
+/api/todos → backend-todo
+
+🐳 6. docker-compose.yml
+Defines and connects all services:
+yaml
+Copy
+Edit
+services:
+  auth:
+    build: ./backend-auth
+    ports: ["5000:5000"]
+    ...
+
+  profile:
+    build: ./backend-profile
+    ports: ["5001:5001"]
+    ...
+
+  todo:
+    build: ./backend-todo
+    ports: ["5002:5002"]
+    ...
+
+  frontend:
+    build: ./frontend
+    ...
+
+  nginx:
+    image: nginx
+    ports: ["80:80"]
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+🔁 Request Flow (End-to-End):
+User visits site (e.g., http://localhost)
+
+NGINX serves frontend from frontend/dist
+
+Frontend makes requests to /api/...
+
+NGINX routes API calls to respective backend:
+
+/api/auth → auth service (port 5000)
+
+/api/profile → profile service (port 5001)
+
+/api/todos → todo service (port 5002)
+
+📌 What You’ve Implemented:
+✅ Microservices
+✅ JWT Auth
+✅ MongoDB with Mongoose
+✅ Dockerized services
+✅ Reverse Proxy with NGINX
+✅ Vite + React frontend
+✅ Docker Compose orchestration
