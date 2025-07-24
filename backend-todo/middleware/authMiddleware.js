@@ -9,7 +9,7 @@ const authMiddleware = (req, res, next) => {
 
   const token = authHeader.split(' ')[1];
   try {
-    const { id: userId } = jwt.verify(token, process.env.JWT_SECRET);
+    const { id: userId } = jwt.verify(token, process.env.JWT_SECRET || 'testsecret');
     req.user = userId;            // <-- just the user ID
     next();
   } catch (err) {

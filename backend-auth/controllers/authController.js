@@ -12,7 +12,14 @@ export const signup = async (req, res) => {
     const user = new User({ email, password: hashed });
     await user.save();
 
-    res.status(201).json({ msg: 'Signup successful' });
+    // Create token immediately after signup
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    // ✅ Match test expectation: include both `token` and `msg`
+    res.status(201).json({
+      token,
+      msg: 'Signup successful',
+    });
   } catch (err) {
     res.status(500).json({ msg: 'Server error', error: err.message });
   }
@@ -29,7 +36,7 @@ export const login = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
-    res.json({ token });
+    res.status(200).json({ token });
   } catch (err) {
     res.status(500).json({ msg: 'Server error', error: err.message });
   }
