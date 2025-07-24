@@ -12,14 +12,14 @@ export default function Signup() {
     e.preventDefault();
     setError(null);
     try {
-      const res = await fetch('/api/auth/signup', {  // Updated API URL
+      const res = await fetch(`${import.meta.env.VITE_AUTH_API}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.msg || 'Signup failed');
-      navigate('/login');  // Redirect to login page after successful signup
+      navigate('/login');
     } catch (err) {
       setError(err.message);
     }
@@ -30,25 +30,11 @@ export default function Signup() {
       <h2>Sign Up for user</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required />
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
         <button type="submit">Sign Up</button>
       </form>
-      <p>
-        Already have an account? <Link to="/login">Login here</Link>
-      </p>
+      <p>Already have an account? <Link to="/login">Login here</Link></p>
     </div>
   );
 }

@@ -10,16 +10,11 @@ export default function Todos() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!token) navigate('/login');
-  }, [token, navigate]);
-
   const fetchTodos = async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/todos/', {
+      const res = await fetch(`${import.meta.env.VITE_TODO_API}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -36,7 +31,8 @@ export default function Todos() {
   };
 
   useEffect(() => {
-    fetchTodos();
+    if (!token) navigate('/login');
+    else fetchTodos();
   }, []);
 
   const addTodo = async e => {
@@ -44,7 +40,7 @@ export default function Todos() {
     if (!text.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/todos/', {
+      const res = await fetch(`${import.meta.env.VITE_TODO_API}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,10 +62,9 @@ export default function Todos() {
   const toggleComplete = async id => {
     const todo = todos.find(t => t._id === id);
     if (!todo) return;
-
     setLoading(true);
     try {
-      const res = await fetch(`/api/todos/${id}/`, {
+      const res = await fetch(`${import.meta.env.VITE_TODO_API}/${id}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +85,7 @@ export default function Todos() {
   const deleteTodo = async id => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/todos/${id}/`, {
+      const res = await fetch(`${import.meta.env.VITE_TODO_API}/${id}/`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -113,14 +108,8 @@ export default function Todos() {
       {loading && <p>Loading...</p>}
 
       <form onSubmit={addTodo}>
-        <input
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder="New todo"
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Adding...' : 'Add'}
-        </button>
+        <input value={text} onChange={e => setText(e.target.value)} placeholder="New todo" />
+        <button type="submit" disabled={loading}>{loading ? 'Adding...' : 'Add'}</button>
       </form>
 
       <ul>
@@ -138,18 +127,12 @@ export default function Todos() {
           </li>
         ))}
       </ul>
-      <button onClick={() => navigate('/profile')}>
-        Go to Profile
-      </button>
 
-      <button
-        onClick={() => {
-          localStorage.removeItem('token');
-          navigate('/login');
-        }}
-      >
-        Logout
-      </button>
+      <button onClick={() => navigate('/profile')}>Go to Profile</button>
+      <button onClick={() => {
+        localStorage.removeItem('token');
+        navigate('/login');
+      }}>Logout</button>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function Login({ setToken }) {
     e.preventDefault();
     setError(null);
     try {
-      const res = await fetch('/api/auth/login', {  // Updated API URL
+      const res = await fetch(`${import.meta.env.VITE_AUTH_API}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -20,13 +20,8 @@ export default function Login({ setToken }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.msg || 'Login failed');
 
-      // Save the token to localStorage
       localStorage.setItem('token', data.token);
-
-      // Update the React state
-      setToken(data.token); // Set the token in the parent component state
-
-      // Navigate to the /todos page after successful login
+      setToken(data.token);
       navigate('/todos');
     } catch (err) {
       setError(err.message);
@@ -38,25 +33,11 @@ export default function Login({ setToken }) {
       <h2>Login</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
+        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" required />
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
         <button type="submit">Login</button>
       </form>
-      <p>
-        Don't have an account? <Link to="/signup">Sign Up here!</Link>
-      </p>
+      <p>Don't have an account? <Link to="/signup">Sign Up here!</Link></p>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+// src/components/Profile.js
 import React, { useEffect, useState } from 'react';
 
 export default function Profile() {
@@ -10,14 +11,11 @@ export default function Profile() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('/api/profile/', {
+        const res = await fetch(`${import.meta.env.VITE_PROFILE_API}/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!res.ok) {
-          throw new Error(`Server responded ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`Server responded ${res.status}`);
         const { todos } = await res.json();
         setTodos(todos);
       } catch (err) {
@@ -32,11 +30,11 @@ export default function Profile() {
   }, []);
 
   if (loading) return <div>Loading your todos…</div>;
-  if (error)   return <div style={{ color: 'red' }}>{error}</div>;
+  if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
     <div>
-      <h2>Your Todos</h2>
+      <h2>Your Todos (via Profile Service)</h2>
       {todos.length === 0 ? (
         <p>No todos yet.</p>
       ) : (
@@ -44,11 +42,7 @@ export default function Profile() {
           {todos.map(todo => (
             <li key={todo._id}>
               <label>
-                <input
-                  type="checkbox"
-                  checked={todo.completed}
-                  readOnly
-                />{' '}
+                <input type="checkbox" checked={todo.completed} readOnly />{' '}
                 {todo.text}
               </label>
             </li>
