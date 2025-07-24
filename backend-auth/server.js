@@ -7,9 +7,24 @@ import authRoutes from './routes/auth.js';
 dotenv.config();
 const app = express();
 
-// Allow only localhost or other domains you trust
-const allowedOrigins = ['http://localhost'];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+// ✅ Update this to include your deployed frontend domain
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost', 
+  'https://frontend-ofb0.onrender.com' // <-- add this
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Auth routes
