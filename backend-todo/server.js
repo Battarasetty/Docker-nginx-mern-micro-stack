@@ -9,9 +9,23 @@ import todoRoutes from './routes/todos.js';
 dotenv.config();
 const app = express();
 
-// Allow specific origins for CORS
-const allowedOrigins = ['http://localhost'];
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+const allowedOrigins = [
+  'http://localhost',
+  'http://localhost:3000',
+  'https://frontend-ofb0.onrender.com'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Routes
