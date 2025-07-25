@@ -56,12 +56,12 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-todo:latest ./backend-todo
           docker push ${{ secrets.DOCKER_USERNAME }}/backend-todo:latest
 
-      - name: 🐳 Build & Push frontend
+      - name: 🐳 Build & Push frontend with ENV
         run: |
           docker build \
-            --build-arg VITE_AUTH_API=https://backend-auth-latest.onrender.com/api/auth \
-            --build-arg VITE_PROFILE_API=https://backend-profile-latest.onrender.com/api/profile \
-            --build-arg VITE_TODO_API=https://backend-todo-latest.onrender.com/api/todos \
+            --build-arg VITE_AUTH_API=${{ secrets.VITE_AUTH_API }} \
+            --build-arg VITE_PROFILE_API=${{ secrets.VITE_PROFILE_API }} \
+            --build-arg VITE_TODO_API=${{ secrets.VITE_TODO_API }} \
             -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
