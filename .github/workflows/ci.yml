@@ -74,13 +74,17 @@ jobs:
       - name: 🔍 Test backend-auth
         run: |
           cd backend-auth
+          echo "PORT=5000" >> .env
+          echo "MONGO_URI=mongodb://localhost:27017/mern_auth" >> .env
+          echo "JWT_SECRET=HARISH" >> .env
           npm ci
           npm test
-
-      # ❌ Removed test for backend-profile
 
       - name: 🔍 Test backend-todo
         run: |
           cd backend-todo
+          echo "PORT=5001" >> .env
+          echo "MONGO_URI=mongodb://localhost:27017/mern_auth" >> .env
+          echo "JWT_SECRET=HARISH" >> .env
           npm ci
           npm test
