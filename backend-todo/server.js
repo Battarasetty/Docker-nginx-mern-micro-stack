@@ -12,7 +12,8 @@ const app = express();
 const allowedOrigins = [
   'http://localhost',
   'http://localhost:3000',
-  'https://frontend-ofb0.onrender.com'
+  'https://frontend-ofb0.onrender.com',
+  'https://frontend-latest-xqk5.onrender.com'
 ];
 
 app.use(cors({
