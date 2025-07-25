@@ -14,15 +14,82 @@ NGINX: Acts as reverse proxy and static file server
 Docker Compose: Manages multi-container app setup
 
 📁 Project Structure
-Copy
-Edit
-mern-todo-nginx/
-├── backend-auth/
-├── backend-profile/
-├── backend-todo/
-├── frontend/
-├── nginx/
-└── docker-compose.yml
+📁 .github
+│   └── workflows
+│       └── docker.yml
+📁 backend-auth
+│   ├── controllers
+│   ├── middleware
+│   │   └── authMiddleware.js
+│   ├── models
+│   ├── routes
+│   ├── tests
+│   ├── .babelrc
+│   ├── .dockerignore
+│   ├── .env
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── jest.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── server.js
+📁 backend-profile
+│   ├── controllers
+│   ├── middleware
+│   │   └── authMiddleware.js
+│   ├── models
+│   ├── routes
+│   ├── tests
+│   ├── .babelrc
+│   ├── .dockerignore
+│   ├── .env
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── jest.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── server.js
+📁 backend-todo
+│   ├── controllers
+│   ├── middleware
+│   │   └── authMiddleware.js
+│   ├── models
+│   ├── routes
+│   ├── tests
+│   ├── .babelrc
+│   ├── .dockerignore
+│   ├── .env
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── jest.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── server.js
+📁 frontend
+│   ├── dist
+│   ├── public
+│   ├── src
+│   │   └── ...
+│   ├── .babelrc
+│   ├── .dockerignore
+│   ├── .env
+│   ├── .eslintrc.js
+│   ├── .gitignore
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── jest.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── vite.config.js
+📁 nginx
+│   ├── default.conf
+│   └── nginx.conf
+📝 MERN + NGINX + Docker Setup Guide (Probably a markdown or text file)
+📝 docker-compose.yml
+📝 mongodb.flow
+📝 network.flow
+📝 volume.flow
+
 🔒 1. backend-auth/
 Handles user registration and login.
 

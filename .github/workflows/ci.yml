@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     services:
@@ -17,13 +17,13 @@ jobs:
           - 27017:27017
 
     steps:
-      - name: Checkout code
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
+      - name: ⚙️ Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers
+      - name: 💾 Cache Docker layers
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
@@ -31,20 +31,60 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build backend-auth
-        run: docker build -t backend-auth ./backend-auth
+      - name: 🔐 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build backend-profile
-        run: docker build -t backend-profile ./backend-profile
+      # 🔨 Build & Push backend-auth
+      - name: 🐳 Build & Push backend-auth
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-auth:latest ./backend-auth
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend-auth:latest
 
-      - name: Build backend-todo
-        run: docker build -t backend-todo ./backend-todo
+      # 🔨 Build & Push backend-profile
+      - name: 🐳 Build & Push backend-profile
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-profile:latest ./backend-profile
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend-profile:latest
 
-      - name: Build frontend
-        run: docker build -t frontend ./frontend
+      # 🔨 Build & Push backend-todo
+      - name: 🐳 Build & Push backend-todo
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-todo:latest ./backend-todo
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend-todo:latest
 
-      - name: Lint frontend code
+      # 🔨 Build & Push frontend
+      - name: 🐳 Build & Push frontend
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+
+      # 🧹 Lint frontend
+      - name: 🧼 Lint frontend
         run: |
           cd frontend
-          npm install
+          npm ci
           npm run lint || true
+
+      # 🧪 Test backend-auth
+      - name: 🔍 Test backend-auth
+        run: |
+          cd backend-auth
+          npm ci
+          npm test
+
+      # 🧪 Test backend-profile
+      - name: 🔍 Test backend-profile
+        run: |
+          cd backend-profile
+          npm ci
+          npm test
+
+      # 🧪 Test backend-todo
+      - name: 🔍 Test backend-todo
+        run: |
+          cd backend-todo
+          npm ci
+          npm test
