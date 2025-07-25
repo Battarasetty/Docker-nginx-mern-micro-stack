@@ -80,11 +80,20 @@ jobs:
           npm ci
           npm test
 
+      - name: 🔍 Test backend-profile
+        run: |
+          cd backend-profile
+          echo "PORT=5002" >> .env
+          echo "MONGO_URI=mongodb://localhost:27017/mern_profile" >> .env
+          echo "JWT_SECRET=HARISH" >> .env
+          npm ci
+          npm test
+
       - name: 🔍 Test backend-todo
         run: |
           cd backend-todo
           echo "PORT=5001" >> .env
-          echo "MONGO_URI=mongodb://localhost:27017/mern_auth" >> .env
+          echo "MONGO_URI=mongodb://localhost:27017/mern_todo" >> .env
           echo "JWT_SECRET=HARISH" >> .env
           npm ci
           npm test
