@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  build-and-test:
+  build-test-and-deploy:
     runs-on: ubuntu-latest
 
     services:
@@ -37,51 +37,52 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 🔨 Build & Push backend-auth
+      #############################################
+      # 🔨 Build & Push Services to Docker Hub
+      #############################################
+
       - name: 🐳 Build & Push backend-auth
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-auth:latest ./backend-auth
           docker push ${{ secrets.DOCKER_USERNAME }}/backend-auth:latest
 
-      # 🔨 Build & Push backend-profile
       - name: 🐳 Build & Push backend-profile
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-profile:latest ./backend-profile
           docker push ${{ secrets.DOCKER_USERNAME }}/backend-profile:latest
 
-      # 🔨 Build & Push backend-todo
       - name: 🐳 Build & Push backend-todo
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-todo:latest ./backend-todo
           docker push ${{ secrets.DOCKER_USERNAME }}/backend-todo:latest
 
-      # 🔨 Build & Push frontend
       - name: 🐳 Build & Push frontend
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
+      #############################################
+      # 🧼 Lint & 🧪 Test Code
+      #############################################
+
       - name: 🧼 Lint frontend
         run: |
           cd frontend
           npm ci
-          npm run lint || true
+          npm run lint || echo "Lint errors ignored for now"
 
-      # 🧪 Test backend-auth
       - name: 🔍 Test backend-auth
         run: |
           cd backend-auth
           npm ci
           npm test
 
-      # 🧪 Test backend-profile
       - name: 🔍 Test backend-profile
         run: |
           cd backend-profile
           npm ci
           npm test
 
-      # 🧪 Test backend-todo
       - name: 🔍 Test backend-todo
         run: |
           cd backend-todo
