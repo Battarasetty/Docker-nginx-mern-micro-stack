@@ -5,7 +5,6 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Accept build-time variables
 ARG VITE_AUTH_API
 ARG VITE_PROFILE_API
 ARG VITE_TODO_API
